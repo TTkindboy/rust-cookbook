@@ -1,22 +1,20 @@
 ## Declare lazily evaluated constant
 
-[![lazy_static-badge]][lazy_static] [![cat-caching-badge]][cat-caching] [![cat-rust-patterns-badge]][cat-rust-patterns]
+[![std-badge]][std] [![cat-caching-badge]][cat-caching] [![cat-rust-patterns-badge]][cat-rust-patterns]
 
-Declares a lazily evaluated constant [`HashMap`]. The [`HashMap`] will
+Declares a lazily evaluated constant [`HashMap`] using [`LazyLock`]. The [`HashMap`] will
 be evaluated once and stored behind a global static reference.
 
 ```rust,edition2018
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
 use std::collections::HashMap;
 
-lazy_static! {
-    static ref PRIVILEGES: HashMap<&'static str, Vec<&'static str>> = {
-        let mut map = HashMap::new();
-        map.insert("James", vec!["user", "admin"]);
-        map.insert("Jim", vec!["user"]);
-        map
-    };
-}
+static PRIVILEGES: LazyLock<HashMap<&'static str, Vec<&'static str>>> = LazyLock::new(|| {
+    let mut map = HashMap::new();
+    map.insert("James", vec!["user", "admin"]);
+    map.insert("Jim", vec!["user"]);
+    map
+});
 
 fn show_access(name: &str) {
     let access = PRIVILEGES.get(name);
@@ -32,3 +30,4 @@ fn main() {
 ```
 
 [`HashMap`]: https://doc.rust-lang.org/std/collections/struct.HashMap.html
+[`LazyLock`]: https://doc.rust-lang.org/std/sync/struct.LazyLock.html
